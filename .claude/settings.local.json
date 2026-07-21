@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth *)",
+      "Bash(git --version)",
+      "WebSearch",
+      "Bash(git init *)",
+      "Bash(gh repo *)",
+      "WebFetch(domain:docs.ag-ui.com)",
+      "WebFetch(domain:a2ui.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:mcpui.dev)",
+      "WebFetch(domain:awesomegenerativeui.com)",
+      "Bash(gh api *)",
+      "Bash(curl -sL https://raw.githubusercontent.com/licenses/license-templates/master/templates/mit.txt -o /dev/null)",
+      "Bash(git add *)",
+      "Bash(git -c user.name=davamix -c user.email=davamix@gmail.com commit -q -m ' *)",
+      "Bash(git push *)"
+    ]
+  }
+}

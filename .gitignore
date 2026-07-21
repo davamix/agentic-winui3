@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+*.user
+AppPackages/
+BundleArtifacts/
+*.appx
+*.msix
+Generated Files/
+.idea/
+node_modules/
