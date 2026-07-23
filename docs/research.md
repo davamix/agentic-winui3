@@ -412,39 +412,39 @@ A useful curated index: <https://awesomegenerativeui.com/papers>
 
 - **Generative UI: LLMs are Effective UI Generators** — Leviathan et al., Google Research, 2025/2026. [arXiv 2604.09577](https://arxiv.org/abs/2604.09577). Argues a properly prompted, tool-equipped modern LLM robustly produces high-quality custom UIs for essentially any prompt, overwhelmingly preferred over markdown output. Introduces the PAGEN dataset. *This is the intellectual foundation of A2UI.*
 - **Generative Interfaces for Language Models** — Chen J. et al., ACL 2026 Findings. [arXiv 2508.19227](https://arxiv.org/abs/2508.19227). LLMs proactively generate UIs instead of prose; human evaluators preferred generative interfaces by up to **72%** on information-dense and exploratory tasks.
-- **Towards a Working Definition of Designing Generative User Interfaces** — Lee K.-H., DIS 2025. First working definition of GenUI: humans and AI collaborate at *design time* to generate interfaces; users interact with AI-generated interfaces at *runtime*. Useful for keeping the Avalonia-style "agent writes your XAML" case separate from the A2UI-style "agent drives your running UI" case.
+- **Towards a Working Definition of Designing Generative User Interfaces** — Lee K.-H., DIS 2025. [arXiv 2505.15049](https://arxiv.org/abs/2505.15049). First working definition of GenUI: humans and AI collaborate at *design time* to generate interfaces; users interact with AI-generated interfaces at *runtime*. Useful for keeping the Avalonia-style "agent writes your XAML" case separate from the A2UI-style "agent drives your running UI" case.
 
 ### Architecture / systems
 
-- **Macaron-A2UI: A Model for Generative UI in Personal Agents** — Kong F. et al., 2026. Large-scale GenUI corpus; models that emit natural language *plus* lightweight executable UI actions for confirmation, preference refinement, and multi-goal coordination.
-- **Software as Content: Dynamic Applications as the Human-Agent Interaction Layer** — Xie M. & Xie Y., 2026. [arXiv 2603.21334](https://arxiv.org/pdf/2603.21334). Dynamically generated applications replacing chat-only interaction.
-- **Portal UX Agent — A Plug-and-Play Engine for Rendering UIs from Natural Language Specifications** — 2025. [arXiv 2511.00843](https://arxiv.org/pdf/2511.00843).
-- **Generative and Malleable User Interfaces with Generative AI** — Cao Y. et al., CHI 2025. Task-driven data models driving dynamic form and visualisation generation.
-- **Gradual Generation of User Interfaces as a Design Method for Malleable Software** — Min B. et al., 2026.
-- **BISCUIT: Scaffolding LLM-Generated Code with Ephemeral UIs in Computational Notebooks** — Cheng R. et al. (Apple), VL/HCC 2024. Ephemeral UI layer between user intent and code generation.
+- **Macaron-A2UI: A Model for Generative UI in Personal Agents** — Kong F. et al., 2026. [arXiv 2605.24830](https://arxiv.org/abs/2605.24830). Large-scale GenUI corpus; models that emit natural language *plus* lightweight executable UI actions for confirmation, preference refinement, and multi-goal coordination.
+- **Software as Content: Dynamic Applications as the Human-Agent Interaction Layer** — Xie M. & Xie Y., 2026. [arXiv 2603.21334](https://arxiv.org/abs/2603.21334). Dynamically generated applications replacing chat-only interaction.
+- **Portal UX Agent — A Plug-and-Play Engine for Rendering UIs from Natural Language Specifications** — 2025. [arXiv 2511.00843](https://arxiv.org/abs/2511.00843).
+- **Generative and Malleable User Interfaces with Generative AI** — Cao Y. et al., CHI 2025. [arXiv 2503.04084](https://arxiv.org/abs/2503.04084). Task-driven data models driving dynamic form and visualisation generation.
+- **Gradual Generation of User Interfaces as a Design Method for Malleable Software** — Min B. et al., 2026. [arXiv 2601.17975](https://arxiv.org/abs/2601.17975).
+- **BISCUIT: Scaffolding LLM-Generated Code with Ephemeral UIs in Computational Notebooks** — Cheng R. et al. (Apple), VL/HCC 2024. [arXiv 2404.07387](https://arxiv.org/abs/2404.07387). Ephemeral UI layer between user intent and code generation.
 
 ### Quality, alignment, evaluation
 
-- **Bridging Gulfs in UI Generation through Semantic Guidance** — 2026. [arXiv 2601.19171](https://arxiv.org/pdf/2601.19171).
-- **AlignUI: Designing LLM-Generated UIs Aligned with User Preferences** — Liu Y. et al., 2026.
-- **Improving User Interface Generation Models from Designer Feedback** — Wu J. et al., 2025.
-- **Efficient Personalization of Generative User Interfaces** — Peng Y.-H. et al., 2026.
+- **Bridging Gulfs in UI Generation through Semantic Guidance** — 2026. [arXiv 2601.19171](https://arxiv.org/abs/2601.19171).
+- **AlignUI: Designing LLM-Generated UIs Aligned with User Preferences** — Liu Y. et al., 2026. [arXiv 2601.17614](https://arxiv.org/abs/2601.17614).
+- **Improving User Interface Generation Models from Designer Feedback** — Wu J. et al., 2025. [arXiv 2509.16779](https://arxiv.org/abs/2509.16779).
+- **Efficient Personalization of Generative User Interfaces** — Peng Y.-H. et al., 2026. [arXiv 2604.09876](https://arxiv.org/abs/2604.09876).
 
 ### Critique and HCI practice
 
-- **The Keyhole Effect: Why Chat Interfaces Fail at Data Analysis** — Mohan Reddy, 2026. The cognitive-science case against linear conversation. Good motivation section material.
-- **What does Generative UI mean for HCI Practice?** — Lindley S. et al., Microsoft Research, CHI EA 2026.
-- **Rethinking the UI of GenUI: A Tale of Two Designs** — Chen X. et al., 2026. Prompt-first vs structured design exploration.
+- **The Keyhole Effect: Why Chat Interfaces Fail at Data Analysis** — Mohan Reddy, 2026. [arXiv 2602.00947](https://arxiv.org/abs/2602.00947). The cognitive-science case against linear conversation. Good motivation section material.
+- **What does Generative UI mean for HCI Practice?** — Lindley S. et al., Microsoft Research, CHI EA 2026. [Microsoft Research](https://www.microsoft.com/en-us/research/publication/what-does-generative-ui-mean-for-hci-practice/).
+- **Rethinking the UI of GenUI: A Tale of Two Designs** — Chen X. et al., 2026. [arXiv 2606.13843v2](https://arxiv.org/abs/2606.13843v2). Prompt-first vs structured design exploration.
 - **Generative AI in Multimodal User Interfaces: Trends, Challenges, and Cross-Platform Adaptability** — 2024. [arXiv 2411.10234](https://arxiv.org/pdf/2411.10234).
 
 ### Applied / domain
 
-- **TaskLens: Task-Conditioned Scaffolded Interfaces for Learning Professional Creative Software** — Liu Y. et al., DIS 2026.
-- **Spatula: On-Demand In-Situ Interfaces for Attribute Control** — Li B. et al., 2026.
-- **AI Prototyper: Figma Plugin for Decomposition-Based GUI Prototyping with LLMs** — Salangsingha T. et al., 2026.
-- **MAIC-UI: Making Interactive Courseware with Generative UI** — Tu S. et al., 2026.
-- **Generative UI as an Accessibility Bridge: Lessons from C2C E-Commerce** — Ryskeldiev B., CHI 2026 workshop.
-- **The Missing Layer: Why EdTech Needs Design-Time Generative UI** — Neshaei S. P. et al., 2026.
+- **TaskLens: Task-Conditioned Scaffolded Interfaces for Learning Professional Creative Software** — Liu Y. et al., DIS 2026. [ACM DL 3800645.3813081](https://dl.acm.org/doi/10.1145/3800645.3813081).
+- **Spatula: On-Demand In-Situ Interfaces for Attribute Control** — Li B. et al., 2026. [arXiv 2607.10405](https://arxiv.org/abs/2607.10405).
+- **AI Prototyper: Figma Plugin for Decomposition-Based GUI Prototyping with LLMs** — Salangsingha T. et al., 2026. [arXiv 2607.14830](https://arxiv.org/abs/2607.14830).
+- **MAIC-UI: Making Interactive Courseware with Generative UI** — Tu S. et al., 2026. [arXiv 2604.25806](https://arxiv.org/abs/2604.25806).
+- **Generative UI as an Accessibility Bridge: Lessons from C2C E-Commerce** — Ryskeldiev B., CHI 2026 workshop. [arXiv 2604.25455](https://arxiv.org/abs/2604.25455).
+- **The Missing Layer: Why EdTech Needs Design-Time Generative UI** — Neshaei S. P. et al., 2026. [arXiv 2606.15902](https://arxiv.org/abs/2606.15902).
 
 ---
 
