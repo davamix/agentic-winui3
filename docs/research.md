@@ -1,6 +1,6 @@
 # Agentic UI for WinUI 3 — Research Dossier
 
-> Last updated: 2026-07-21
+> Last updated: 2026-07-24
 >
 > Goal: understand how the emerging agentic-UI protocols (AG-UI, A2UI, MCP-UI / MCP Apps) work, what they assume about the host, and how they could be applied to a **native WinUI 3 / Windows App SDK** desktop application.
 
@@ -49,7 +49,7 @@ They compose rather than compete. A realistic stack:
 | --- | --- | --- | --- |
 | Layer | Transport / session | Presentation | Tool-attached UI |
 | Payload | ~30 typed events | Component tree + data model | HTML resource (`ui://`) |
-| Origin | CopilotKit | Google | MCP-UI community → MCP core (OpenAI + Anthropic) |
+| Origin | CopilotKit | Google | MCP-UI community → official MCP **extension** (OpenAI + Anthropic) |
 | License | MIT | Apache-2.0 | MIT / Apache-2.0 |
 | Native-friendly? | ✅ Yes, transport-agnostic | ✅ Yes, by design | ❌ Assumes HTML + iframe |
 | .NET support today | ✅ Official-ish (Microsoft Agent Framework) | ⚠️ Blazor only (community) | ⚠️ Needs WebView2 |
@@ -224,12 +224,23 @@ They were designed to interoperate — CopilotKit contributed to A2UI and shippe
 ## 4. MCP-UI and MCP Apps (SEP-1865)
 
 - MCP-UI: <https://mcpui.dev> · <https://github.com/MCP-UI-Org/mcp-ui> (Apache-2.0, ~5k ★)
-- MCP Apps spec: <https://github.com/modelcontextprotocol/ext-apps> · [SEP-1865](https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp)
-- Blog posts: [Nov 2025 announcement](https://blog.modelcontextprotocol.io/posts/2025-11-21-mcp-apps/) · [Jan 2026 spec release](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/)
+- MCP Apps spec: <https://github.com/modelcontextprotocol/ext-apps> · [SEP-1865](https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp) · [PR #1865](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1865)
+- Blog posts: [Nov 2025 announcement](https://blog.modelcontextprotocol.io/posts/2025-11-21-mcp-apps/) · [Jan 2026 spec release](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/) · [Jul 2026 release candidate](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate/)
 
-### What happened
+### What happened — and why it now matters more
 
-MCP-UI started as a community extension of MCP's embedded-resources spec, adding a `UIResource` type. It has now been **standardised into MCP core as the MCP Apps extension (SEP-1865)**, authored by MCP core maintainers at OpenAI and Anthropic together with the MCP-UI creators and the MCP UI Community Working Group. The npm/PyPI/gem `mcp-ui` packages continue as the community testing ground ahead of the spec.
+**MCP Apps is the official way to render UI in MCP.** That became true with the **MCP `2026-07-28` release candidate** (announced 21 May 2026, final spec 28 July 2026), which introduces a first-class **extensions mechanism** and ships MCP Apps as one of its first two official extensions (the other is **Tasks**).
+
+Naming, because it trips people up:
+
+- **MCP-UI** — the *community* project and SDK (`@mcp-ui/*`, the `mcpui.dev` site, the UI Community Working Group). This is where the idea and the reference code came from, and it continues as the testing ground ahead of the spec.
+- **MCP Apps** — the *official extension* that standardises that approach. Authored by MCP core maintainers at OpenAI and Anthropic together with the MCP-UI creators, drawing also on the OpenAI Apps SDK. This is the thing the spec blesses.
+
+So the common shorthand "MCP-UI is the official way to build MCP UIs" is right in spirit — but the standardised artefact is called **MCP Apps**, and it is an **extension, not part of MCP core**. That distinction is load-bearing:
+
+> Under the new mechanism, extensions are **identified by reverse-DNS IDs**, **negotiated through an `extensions` map** on client and server capabilities, **version independently of the base spec**, and live in **separate repos under their own governance** ("delegated maintainers"). The framework is explicitly "a path from experimental to official" — extensions stabilise on their own track before anything is folded into core.
+
+Practical consequence for us: a WinUI host does **not** have to support MCP Apps to be a valid MCP client. Support is *negotiated* and *opt-in*. That turns "do we render MCP Apps UI natively?" into a deliberate capability choice rather than a conformance requirement — which is exactly the lever a native app wants.
 
 ### How it works
 
@@ -247,9 +258,16 @@ SDKs: `@mcp-ui/client`, `@mcp-ui/server` (npm), `mcp_ui_server` (Ruby), `mcp-ui-
 
 ### Implication for WinUI 3
 
-**This is the least portable of the three.** The security model is *defined in terms of* iframe sandboxing, and the content type is HTML. On WinUI 3 there is exactly one honest way to support it: host a **WebView2** and implement the host side of the postMessage JSON-RPC bridge. That's viable — WebView2 is first-class in Windows App SDK — but the result is a web island in a native app, not a native agentic UI.
+Two things are true at once now, and both matter:
 
-The `remoteDom` mode, or a future non-HTML profile, would be the escape hatch. Worth tracking the spec.
+**1. It is still the least *portable* of the three.** The security model is *defined in terms of* iframe sandboxing, and the content type is HTML (`text/html;profile=mcp-app`). On WinUI 3 there is exactly one honest way to support it: host a **WebView2** and implement the host side of the postMessage JSON-RPC bridge. That's viable — WebView2 is first-class in Windows App SDK — but the result is a web island in a native app, not a native agentic UI. The `remoteDom` mode, or a future non-HTML profile, would be the escape hatch. Worth tracking the spec.
+
+**2. But it is now the most *strategically important* of the three.** A2UI is architecturally nicer for native, yet MCP Apps is what the broad MCP ecosystem — Claude, ChatGPT, VS Code, Windows' own native MCP host — will actually speak. If the goal is for *third-party* MCP servers to surface UI inside our WinUI app, that UI will arrive as MCP Apps HTML, and A2UI won't help. This is the central tension of the whole project:
+
+> **A2UI** = *our* agent renders *native* Fluent UI in our app (best experience, we control both ends).
+> **MCP Apps** = *anyone's* MCP server renders UI in our app (widest reach, but HTML-in-WebView2, and we only control the host side).
+
+They are not either/or. The likely answer is a WinUI app that renders its *own* agent's output natively (A2UI-style, architecture B) **and** hosts foreign MCP-Apps surfaces in a sandboxed WebView2 (architecture A) — declaring MCP Apps support through the `extensions` capability map only where it earns its keep. See §8.
 
 Useful deep dives: [WorkOS technical overview](https://workos.com/blog/mcp-ui-a-technical-deep-dive-into-interactive-agent-interfaces) · [fka.dev MCP Apps 101](https://blog.fka.dev/blog/2025-11-22-mcp-apps-101-bringing-interactive-uis-to-ai-conversations/) · [CopilotKit: MCP Apps in your own app via AG-UI](https://www.copilotkit.ai/blog/bring-mcp-apps-into-your-own-app-with-copilotkit-and-ag-ui)
 
@@ -378,7 +396,7 @@ LLM emits XAML, app parses it.
 
 ### Recommended direction
 
-Combine: **AG-UI for the session + A2UI for the presentation + MCP/App Actions for capability**, on architecture **B**, with **A** kept in reserve for MCP Apps interop.
+Combine: **AG-UI for the session + A2UI for the presentation + MCP/App Actions for capability**, on architecture **B** for our *own* agent's UI — and treat architecture **A** not as a fallback but as a **deliberate second track** for hosting *foreign* MCP Apps surfaces, now that MCP Apps is an official, ecosystem-wide extension (see §4). Whether to advertise MCP Apps support is a per-app decision, made explicit through the MCP `extensions` capability map.
 
 ```
 Agent (Agent Framework, local or cloud)
@@ -388,9 +406,13 @@ Agent (Agent Framework, local or cloud)
         │  Microsoft.Agents.AI.AGUI
         ▼
    WinUI 3 app
-     ├─ chat / activity / reasoning panes  ← AG-UI events → view models
-     └─ agent-driven surfaces              ← A2UI messages → WinUI component catalog
+     ├─ chat / activity / reasoning panes   ← AG-UI events → view models
+     ├─ OUR agent's surfaces (native)       ← A2UI messages → WinUI component catalog   [arch B]
+     └─ FOREIGN MCP-server surfaces (web)   ← MCP Apps ui:// HTML → sandboxed WebView2   [arch A]
+                                              (declared via the MCP `extensions` map)
 ```
+
+The two tracks share the chat/activity shell but differ in trust and fidelity: our own agent gets native Fluent widgets; third-party MCP servers get a sandboxed HTML island. That split *is* the design.
 
 ### Known hard problems
 
@@ -461,7 +483,8 @@ A useful curated index: <https://awesomegenerativeui.com/papers>
 - A2UI renderers — <https://a2ui.org/reference/renderers/>
 - A2UI client setup — <https://a2ui.org/guides/client-setup/>
 - MCP Apps spec — <https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx>
-- SEP-1865 — <https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp>
+- MCP `2026-07-28` release candidate (extensions mechanism) — <https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate/>
+- SEP-1865 — <https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp> · [PR #1865](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1865)
 - MCP Resources — <https://modelcontextprotocol.io/specification/draft/server/resources>
 - MCP-UI — <https://mcpui.dev>
 
@@ -499,7 +522,8 @@ A useful curated index: <https://awesomegenerativeui.com/papers>
 1. Does `Microsoft.Agents.AI.AGUI` work cleanly from a WinUI 3 process, or does it assume ASP.NET Core hosting/DI? (Target framework says it should; needs a spike.)
 2. What is the right **WinUI catalog** granularity — mirror the A2UI basic catalog first, or go straight to Fluent-specific components?
 3. Can a WinUI A2UI renderer be written against Uno-compatible APIs so it runs cross-platform for free?
-4. Is there a credible path to a **non-HTML MCP Apps profile**, or is WebView2 the permanent answer for MCP Apps on desktop?
+4. Is there a credible path to a **non-HTML MCP Apps profile** (or does `remoteDom` get us far enough), or is WebView2 the permanent answer for MCP Apps on desktop? Now that MCP Apps is an official extension, this question got more important, not less.
+4a. When our WinUI app acts as an **MCP host**, do we advertise the MCP Apps extension in the `extensions` capability map at all — and if so, only for trusted servers? What is the UX for a foreign server wanting to draw UI?
 5. How do **App Actions** map onto AG-UI **frontend tools**? Is there a clean adapter?
 6. Streaming layout: what is an acceptable coalescing window before UI churn becomes visible?
 7. Does an agent-driven surface need its own **permission model** distinct from the app's, and how is that surfaced to the user?

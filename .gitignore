@@ -10,3 +10,7 @@ Generated Files/
 .idea/
 node_modules/
 .claude/settings.local.json
+
+
+# Personal notes
+notes.txt
