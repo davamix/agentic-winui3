@@ -1,0 +1,3 @@
+{"version":"v0.9","createSurface":{"surfaceId":"contact_form_1","catalogId":"local/winui-basic/v0"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact_form_1","components":[{"id":"root","component":"Column","children":["title","name_field","email_field","submit_button"]},{"id":"title","component":"Text","text":"Contact us"},{"id":"name_field","component":"TextField","label":"Name"},{"id":"email_field","component":"TextField","label":"Email"},{"id":"submit_button","component":"Button","text":"Submit"}]}}
+{"version":"v0.9","beginRendering":{"surfaceId":"contact_form_1"}}
