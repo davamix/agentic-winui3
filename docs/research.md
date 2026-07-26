@@ -528,3 +528,6 @@ A useful curated index: <https://awesomegenerativeui.com/papers>
 6. Streaming layout: what is an acceptable coalescing window before UI churn becomes visible?
 7. Does an agent-driven surface need its own **permission model** distinct from the app's, and how is that surfaced to the user?
 8. Is there value in publishing the WinUI renderer back to the A2UI ecosystem as the missing .NET-native renderer?
+9. **How does a catalog express presentation *role* — heading vs body — for a `Text` component?** A style/variant property, or distinct component types? Raised by [experiment 01](./experiments/experiment-01-static-render.md): the first fixture's "title" rendered correctly and looked wrong, because nothing in the message says it is a heading. This is Q2 (catalog granularity) with a concrete forcing case.
+10. **Where does `catalogId` validation belong, and what happens on mismatch?** Experiment 01 reads and logs the catalog id but never checks that the renderer implements it. A renderer that silently ignores the declared catalog will fail late and confusingly.
+11. **What preserves user state across a re-render?** Build-once replaces the whole subtree, destroying focus, caret, scroll offset and any typed-but-unsent input. Any incremental/streaming design (experiment 03) has to answer this before diffing is worth doing.
