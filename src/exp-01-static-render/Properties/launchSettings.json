@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Exp01.StaticRender (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Exp01.StaticRender (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

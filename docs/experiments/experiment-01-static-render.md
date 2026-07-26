@@ -1,6 +1,6 @@
 # Experiment 01 — Static render
 
-- **Status:** Planned
+- **Status:** In progress
 - **Track:** B — native A2UI renderer for WinUI 3
 - **Started:** 2026-07-25 · **Completed:** —
 - **Depends on:** none (this is the first experiment)
@@ -55,7 +55,41 @@ An A2UI message stream (`createSurface` → `updateComponents` → `beginRenderi
 The catalog id `local/winui-basic/v0` is a **local, informal** catalog — there is no JSON-Schema validation in this experiment. Formalizing the catalog schema as an allow-list is a later concern.
 
 ## 6. Steps
-1. Create `src/exp-01-static-render/` (Run phase) — a minimal packaged WinUI 3 desktop app.
+
+### 0. Toolchain check (done)
+Verified before scaffolding — nothing needed installing beyond the template pack:
+
+| Thing | Found |
+| --- | --- |
+| .NET SDK | 10.0.302 (+ 9.0.119) |
+| Visual Studio | Community 2026 (18.8) — `WindowsAppSdkSupport.CSharp`, single-project MSIX tools, Win11 SDK 26100 |
+| Windows App Runtime | 1.4 → 2.3 installed |
+| `dotnet new` WinUI template | **absent** → `dotnet new install Microsoft.WindowsAppSDK.WinUI.CSharp.Templates` (official pack; machine-wide, not a repo change) |
+
+A throwaway blank app was built in a scratch folder first to confirm the chain works end to end before touching the repo.
+
+### 1. Scaffold `src/exp-01-static-render/` (done)
+```bash
+dotnet new winui -n Exp01.StaticRender -o src/exp-01-static-render
+```
+Template defaults: `net10.0-windows10.0.26100.0`, `Microsoft.WindowsAppSDK` 2.3.1, packaged (`EnableMsixTooling`), namespace `Exp01_StaticRender` (the dot is sanitised out).
+
+Stripped back to the minimum that tests the hypothesis:
+- Deleted `MainPage.xaml(.cs)` and the `Frame` navigation in `MainWindow` — §4 calls for *one* `Window`, and `Frame` + page navigation is machinery this experiment does not use. The root `Grid`'s `Loaded` event replaces `Page.Loaded` as the trigger.
+- Deleted `Properties/PublishProfiles/` and the now-dead `<PublishProfile>` property — publish-only, and the template's own nested `.gitignore` ignored the `.pubxml` files it had just written.
+- Deleted the nested `.gitignore` (the repo root one already covers `bin/`, `obj/`, MSIX output).
+- Trimmed the 12 unused `using`s in `App.xaml.cs` down to `Microsoft.UI.Xaml`.
+- `MainWindow.xaml` now holds the two panels from §4: a `Border x:Name="SurfaceHost"` (renderer attaches here) and a log pane (`ItemsControl x:Name="LogList"`).
+
+**Decision — fixture is linked, not copied.** `samples/` stays the single source of truth for experiments 02–04, which reuse these fixtures:
+```xml
+<Content Include="..\..\samples\a2ui\contact-form.jsonl" Link="Samples\contact-form.jsonl">
+  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+</Content>
+```
+Confirmed it lands at `Samples\contact-form.jsonl` in the build output. Build clean: 0 warnings, 0 errors.
+
+### 2–6. Remaining
 2. Add the protocol records and a `System.Text.Json` reader for the three message types.
 3. Implement SurfaceManager: apply the messages, expose the resolved `root` tree.
 4. Implement the catalog (4 factories) and the renderer (tree walk → controls).
