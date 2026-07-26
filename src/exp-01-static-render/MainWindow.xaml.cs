@@ -1,3 +1,6 @@
+using Exp01_StaticRender.Protocol;
+using Exp01_StaticRender.Rendering;
+using Exp01_StaticRender.Surfaces;
 using Microsoft.UI.Xaml;
 
 namespace Exp01_StaticRender;
@@ -9,6 +12,13 @@ namespace Exp01_StaticRender;
 /// </summary>
 public sealed partial class MainWindow : Window
 {
+    /// <summary>
+    /// The fixture linked into the project by the csproj, so it sits next to the
+    /// app (and inside the MSIX package) rather than at a path relative to the repo.
+    /// </summary>
+    private static readonly string FixturePath =
+        Path.Combine(AppContext.BaseDirectory, "Samples", "contact-form.jsonl");
+
     public MainWindow()
     {
         InitializeComponent();
@@ -17,5 +27,35 @@ public sealed partial class MainWindow : Window
         SetTitleBar(AppTitleBar);
 
         AppWindow.SetIcon("Assets/AppIcon.ico");
+    }
+
+    /// <summary>
+    /// Reads the whole stream and renders it once. Loaded already runs on the UI
+    /// thread and the file source is synchronous, so no DispatcherQueue marshalling
+    /// is needed here — that only becomes a real concern with the live transport
+    /// of experiment 03.
+    /// </summary>
+    private void OnRootLoaded(object sender, RoutedEventArgs e)
+    {
+        var surfaces = new SurfaceManager();
+        var dispatcher = new MessageDispatcher(surfaces);
+
+        dispatcher.MessageRouted += line => LogList.Items.Add(line);
+        dispatcher.RenderRequested += surface =>
+            SurfaceHost.Child = Renderer.Build(surface.Resolve());
+
+        try
+        {
+            foreach (var message in A2uiStreamReader.Read(FixturePath))
+            {
+                dispatcher.Dispatch(message);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Surface failures in the log pane rather than crashing: a broken
+            // fixture is a result worth reading, not a lost run.
+            LogList.Items.Add($"error · {ex.Message}");
+        }
     }
 }
