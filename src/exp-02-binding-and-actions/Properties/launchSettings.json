@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Exp02.BindingAndActions (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Exp02.BindingAndActions (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
