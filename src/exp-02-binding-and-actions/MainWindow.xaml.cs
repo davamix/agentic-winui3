@@ -17,7 +17,7 @@ public sealed partial class MainWindow : Window
     /// app (and inside the MSIX package) rather than at a path relative to the repo.
     /// </summary>
     private static readonly string FixturePath =
-        Path.Combine(AppContext.BaseDirectory, "Samples", "contact-form.jsonl");
+        Path.Combine(AppContext.BaseDirectory, "Samples", "contact-form-bound.jsonl");
 
     public MainWindow()
     {
@@ -42,7 +42,10 @@ public sealed partial class MainWindow : Window
 
         dispatcher.MessageRouted += line => LogList.Items.Add(line);
         dispatcher.RenderRequested += surface =>
-            SurfaceHost.Child = Renderer.Build(surface.Resolve());
+        {
+            var context = new RenderContext(new BindingResolver(surface.Data));
+            SurfaceHost.Child = Renderer.Build(surface.Resolve(), context);
+        };
 
         try
         {

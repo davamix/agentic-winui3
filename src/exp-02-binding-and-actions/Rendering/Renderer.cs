@@ -5,8 +5,12 @@ namespace Exp02_BindingAndActions.Rendering;
 
 /// <summary>
 /// Turns a resolved component tree into a native WinUI control tree.
-/// Build-once: there is no diffing against a previous render, which is what
-/// experiment 03 adds.
+///
+/// Still build-once, and deliberately so. Experiment 02 makes the surface *live*
+/// without making it rebuild: state changes reach the controls through the
+/// bindings the factories set up during this single pass, never through a second
+/// call to <see cref="Build"/>. Diffing an existing tree against a new one is
+/// experiment 03's problem.
 /// </summary>
 internal static class Renderer
 {
@@ -15,13 +19,13 @@ internal static class Renderer
     /// already constructed. Must be called on the UI thread, since it creates
     /// XAML controls.
     /// </summary>
-    public static FrameworkElement Build(ResolvedNode node)
+    public static FrameworkElement Build(ResolvedNode node, RenderContext context)
     {
         var children = node.Children.Count == 0
             ? []
-            : node.Children.Select(Build).ToArray();
+            : node.Children.Select(child => Build(child, context)).ToArray();
 
         var factory = Catalog.Get(node.Component.Component);
-        return factory(node.Component, children);
+        return factory(node.Component, children, context);
     }
 }

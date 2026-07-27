@@ -5,12 +5,20 @@ using Microsoft.UI.Xaml.Controls;
 namespace Exp02_BindingAndActions.Rendering;
 
 /// <summary>
+/// What a factory needs besides the component itself. Passing one object rather
+/// than a growing parameter list means adding a capability later (a theme, a
+/// navigation callback) does not touch every factory signature.
+/// </summary>
+internal sealed record RenderContext(BindingResolver Bindings);
+
+/// <summary>
 /// Builds the native control for one component. Children arrive already built,
 /// so a factory never recurses — the renderer owns the walk.
 /// </summary>
 internal delegate FrameworkElement ComponentFactory(
     ComponentNode component,
-    IReadOnlyList<FrameworkElement> children);
+    IReadOnlyList<FrameworkElement> children,
+    RenderContext context);
 
 /// <summary>
 /// The component catalog: the closed set of A2UI component types this host can
@@ -18,6 +26,11 @@ internal delegate FrameworkElement ComponentFactory(
 /// here and nowhere else, the agent can only ever name a control the host already
 /// knows how to build — that is the whole safety story of the approach, and the
 /// reason no code from the stream is ever executed.
+///
+/// Experiment 02 changes no *membership* — still the same four types — but three
+/// of them gain behaviour. That the set stayed the same while the surface became
+/// interactive is itself a result: binding and actions are properties of the
+/// catalog's *mapping*, not of its vocabulary.
 /// </summary>
 internal static class Catalog
 {
@@ -30,7 +43,7 @@ internal static class Catalog
     private static readonly Dictionary<string, ComponentFactory> Factories =
         new(StringComparer.Ordinal)
         {
-            ["Column"] = (_, children) =>
+            ["Column"] = (_, children, _) =>
             {
                 var panel = new StackPanel { Orientation = Orientation.Vertical, Spacing = 12 };
                 foreach (var child in children)
@@ -41,18 +54,45 @@ internal static class Catalog
                 return panel;
             },
 
-            ["Text"] = (component, _) => new TextBlock
+            // One-way. `text` may be a literal or a {path}; the resolver applies
+            // whichever it is now, and re-applies on every later model change.
+            ["Text"] = (component, _, context) =>
             {
-                Text = component.GetString("text") ?? string.Empty,
+                var block = new TextBlock { TextWrapping = TextWrapping.Wrap };
+                context.Bindings.Bind(component.GetDynamic("text"), text => block.Text = text);
+                return block;
             },
 
-            ["TextField"] = (component, _) => new TextBox
+            // Two-way. `label` stays a literal — it names the field, it is not
+            // state — while `value` binds in both directions.
+            ["TextField"] = (component, _, context) =>
             {
-                Header = component.GetString("label"),
+                var box = new TextBox { Header = component.GetString("label") };
+                var value = component.GetDynamic("value");
+
+                context.Bindings.Bind(value, text =>
+                {
+                    // Guard the echo: this control's own edit writes to the model,
+                    // which notifies straight back here. Re-assigning the identical
+                    // string would be a no-op for the dependency property, but the
+                    // guard makes the intent explicit and keeps a future formatting
+                    // binding from fighting the user's caret.
+                    if (box.Text != text)
+                    {
+                        box.Text = text;
+                    }
+                });
+
+                if (context.Bindings.WriteBack(value) is { } writeBack)
+                {
+                    box.TextChanged += (_, _) => writeBack(box.Text);
+                }
+
+                return box;
             },
 
-            // No Click handler: actions are experiment 02. The button renders inert.
-            ["Button"] = (component, _) => new Button
+            // Actions are wired in the next step; the button is still inert here.
+            ["Button"] = (component, _, _) => new Button
             {
                 Content = component.GetString("text") ?? string.Empty,
             },
