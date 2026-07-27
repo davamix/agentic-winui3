@@ -11,7 +11,7 @@ Follow **[experiment-setup-guide.md](./experiment-setup-guide.md)**. In short: c
 | # | Experiment | Proves | Status |
 | --- | --- | --- | --- |
 | 01 | [static-render](./experiment-01-static-render.md) | An A2UI message stream renders as native WinUI controls | Done ✅ |
-| 02 | binding-and-actions *(planned)* | Two-way data binding + action round-trip | — |
+| 02 | [binding-and-actions](./experiment-02-binding-and-actions.md) | Two-way data binding + action round-trip | Planned |
 | 03 | live-stream *(planned)* | File→SSE transport, incremental updates, UI-thread marshalling | — |
 | 04 | real-producer *(planned)* | An agent (Agent Framework, optionally via MCP) emits the A2UI stream | — |
 
