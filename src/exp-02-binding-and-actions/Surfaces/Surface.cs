@@ -23,6 +23,13 @@ internal sealed class Surface(string surfaceId, string? catalogId)
 
     public string? CatalogId { get; } = catalogId;
 
+    /// <summary>
+    /// The surface's state. New in experiment 02, and kept per-surface rather
+    /// than global because the protocol keys every <c>updateDataModel</c> by
+    /// surface id — two surfaces are two independent models.
+    /// </summary>
+    public DataModel Data { get; } = new();
+
     public int ComponentCount => _components.Count;
 
     /// <summary>

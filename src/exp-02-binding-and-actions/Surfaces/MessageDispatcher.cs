@@ -25,6 +25,12 @@ internal sealed class MessageDispatcher(SurfaceManager surfaces)
                 $"createSurface · {create.SurfaceId} · catalog {create.CatalogId ?? "(none)"}");
         }
 
+        if (message.UpdateDataModel is { } model)
+        {
+            surfaces.Get(model.SurfaceId).Data.Write(model.Path, model.Value);
+            MessageRouted?.Invoke($"updateDataModel · {model.SurfaceId} · {model.Path}");
+        }
+
         if (message.UpdateComponents is { } update)
         {
             surfaces.Get(update.SurfaceId).Apply(update.Components);
