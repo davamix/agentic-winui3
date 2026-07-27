@@ -74,6 +74,7 @@ We do **not** create empty `src/` folders ahead of time — git does not track e
 16. Set the final **status** (`Done ✅`, `Blocked`, or `Abandoned`) and dates.
 17. **Update the index** row in [`README.md`](./README.md).
 18. **Feed findings back:** move any lasting open questions into [`../research.md`](../research.md) §11, and if a result changes the project's direction, update the relevant part of `research.md`.
+19. **Split off the environment problems.** Anything that cost time but had nothing to do with the hypothesis — a template that generates contradictory files, a screenshot that captures the wrong window, a tool with a surprising parser — goes to [`../toolchain-notes.md`](../toolchain-notes.md). It stays in the experiment's "❌ What didn't work" as well; that section is a log and is not rewritten. The point of copying it out is that the next experiment will not think to read this one's write-up.
 
 ---
 
@@ -104,6 +105,8 @@ An experiment is `Done ✅` when:
 - [ ] The hypothesis is answered — confirmed *or* refuted (a refuted hypothesis is a successful experiment).
 - [ ] Actual result is recorded, with **✅ what worked** and **❌ what didn't**.
 - [ ] Open questions are captured (in the doc, and promoted to `research.md` §11 if lasting).
+- [ ] Any **environment / tooling** problems are copied to [`../toolchain-notes.md`](../toolchain-notes.md).
+- [ ] Every Mermaid diagram in the write-up **parses** (see [toolchain-notes §4.1](../toolchain-notes.md#41-mermaid-treats--as-a-statement-separator)).
 - [ ] The next experiment is named in **Outcome & next**.
 - [ ] The index row in `README.md` is updated.
 
