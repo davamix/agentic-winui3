@@ -65,7 +65,7 @@ sequenceDiagram
     participant Resp as ScriptedResponder
     participant Disp as MessageDispatcher
 
-    Note over UI,Model: build-once render has already happened;<br/>controls are subscribed to their paths
+    Note over UI,Model: build-once render has already happened —<br/>controls are subscribed to their paths
 
     rect rgba(128,128,128,0.08)
     Note right of User: two-way binding
