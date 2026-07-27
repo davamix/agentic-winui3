@@ -22,16 +22,20 @@ internal static class A2uiStreamReader
     {
         foreach (var line in File.ReadLines(path))
         {
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                continue;
-            }
-
-            var message = JsonSerializer.Deserialize<A2uiMessage>(line, Options);
-            if (message is not null)
+            if (Parse(line) is { } message)
             {
                 yield return message;
             }
         }
     }
+
+    /// <summary>
+    /// Parses a single line, or returns null for a blank one. Exposed separately
+    /// because the <c>ScriptedResponder</c> rewrites a line's text before parsing
+    /// it — the only caller that needs the two steps apart.
+    /// </summary>
+    public static A2uiMessage? Parse(string line) =>
+        string.IsNullOrWhiteSpace(line)
+            ? null
+            : JsonSerializer.Deserialize<A2uiMessage>(line, Options);
 }

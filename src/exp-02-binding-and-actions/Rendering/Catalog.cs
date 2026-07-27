@@ -1,3 +1,4 @@
+using Exp02_BindingAndActions.Actions;
 using Exp02_BindingAndActions.Protocol;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -9,7 +10,7 @@ namespace Exp02_BindingAndActions.Rendering;
 /// than a growing parameter list means adding a capability later (a theme, a
 /// navigation callback) does not touch every factory signature.
 /// </summary>
-internal sealed record RenderContext(BindingResolver Bindings);
+internal sealed record RenderContext(BindingResolver Bindings, ActionChannel Actions);
 
 /// <summary>
 /// Builds the native control for one component. Children arrive already built,
@@ -91,10 +92,22 @@ internal static class Catalog
                 return box;
             },
 
-            // Actions are wired in the next step; the button is still inert here.
-            ["Button"] = (component, _, _) => new Button
+            // The only component that sends anything back. A Button without an
+            // action declaration renders inert, exactly as in experiment 01 —
+            // interactivity is something the producer asks for, not a default.
+            ["Button"] = (component, _, context) =>
             {
-                Content = component.GetString("text") ?? string.Empty,
+                var button = new Button
+                {
+                    Content = component.GetString("text") ?? string.Empty,
+                };
+
+                if (component.GetAction() is { } action)
+                {
+                    button.Click += (_, _) => context.Actions.Send(action, component.Id);
+                }
+
+                return button;
             },
         };
 
