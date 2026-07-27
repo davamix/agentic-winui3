@@ -41,6 +41,77 @@ An A2UI message stream (`createSurface` → `updateComponents` → `beginRenderi
 | ~~BindingResolver~~ | — | Deferred → exp 02 |
 | ~~ActionChannel~~ | — | Deferred → exp 02 |
 
+### How they interact
+
+One pass over the stream, then one build. The dispatcher never renders — it routes and signals, and the host decides when to build controls.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Host as MainWindow (host)
+    participant Reader as A2uiStreamReader
+    participant Disp as MessageDispatcher
+    participant Mgr as SurfaceManager
+    participant Surf as Surface
+    participant Rend as Renderer
+    participant Cat as Catalog
+    participant UI as SurfaceHost + LogList
+
+    Note over Host: Grid.Loaded — already on the UI thread,<br/>so no DispatcherQueue marshalling needed
+    Host->>Reader: Read(contact-form.jsonl)
+    Note right of Reader: lazy — one message<br/>pulled per line
+
+    rect rgba(128,128,128,0.08)
+    Reader-->>Host: createSurface
+    Host->>Disp: Dispatch(message)
+    Disp->>Mgr: Create(surfaceId, catalogId)
+    Mgr->>Surf: new Surface
+    Disp-->>Host: MessageRouted(summary)
+    Host->>UI: append log line
+    end
+
+    rect rgba(128,128,128,0.08)
+    Reader-->>Host: updateComponents (5 components)
+    Host->>Disp: Dispatch(message)
+    Disp->>Mgr: Get(surfaceId)
+    Mgr-->>Disp: Surface
+    Disp->>Surf: Apply(components)
+    Note right of Surf: add-or-replace by id —<br/>children stay as ids
+    Disp-->>Host: MessageRouted(summary)
+    Host->>UI: append log line
+    end
+
+    rect rgba(128,128,128,0.08)
+    Reader-->>Host: beginRendering
+    Host->>Disp: Dispatch(message)
+    Disp->>Mgr: Get(surfaceId)
+    Mgr-->>Disp: Surface
+    Disp-->>Host: MessageRouted(summary)
+    Host->>UI: append log line
+    Disp-->>Host: RenderRequested(surface)
+    end
+
+    Host->>Surf: Resolve()
+    Note right of Surf: walk out from 'root',<br/>look each child id up
+    Surf-->>Host: ResolvedNode tree
+
+    Host->>Rend: Build(rootNode)
+    loop depth-first, per component
+        Rend->>Cat: Get(component type)
+        Cat-->>Rend: ComponentFactory
+        Rend->>Cat: factory(component, built children)
+        Cat-->>Rend: native control
+    end
+    Rend-->>Host: FrameworkElement (root control)
+
+    Host->>UI: SurfaceHost.Child = root control
+```
+
+Two boundaries the diagram is meant to make obvious:
+
+- **Resolve and build are separate passes.** `Surface` turns the flat adjacency list into a tree; `Renderer` turns that tree into controls. Neither knows about the other's concerns, which is why the tree could be checked without any XAML in play.
+- **Every control originates in `Catalog`.** The renderer walks and delegates; it never constructs a control itself. That single choke point is what keeps the agent from naming anything the host cannot already build.
+
 ## 5. Inputs / fixtures
 - [`samples/a2ui/contact-form.jsonl`](../../samples/a2ui/contact-form.jsonl) — three A2UI messages, one per line: create a surface, define five components (a `Column` root containing a title `Text`, two `TextField`s, and a `Button`), begin rendering. Literal values only.
 
